@@ -1,0 +1,125 @@
+version: '3'
+
+services:
+  postgres-master-library:
+    image: bitnami/postgresql-repmgr:latest
+#    image: 1st:latest
+    environment:
+      POSTGRESQL_POSTGRES_PASSWORD: SPIRIDONOV_214
+      POSTGRESQL_USERNAME: SPIRIDONOV_214
+      POSTGRESQL_PASSWORD: SPIRIDONOV_214
+      POSTGRESQL_DATABASE: SPIRIDONOV_214
+      REPMGR_PASSWORD: repmgrpassword
+      REPMGR_PRIMARY_HOST: postgres-master-library
+      REPMGR_PARTNER_NODES: postgres-master-library,postgres-slave-library
+      REPMGR_NODE_NAME: node-1
+      REPMGR_NODE_NETWORK_NAME: postgres-master-library
+    ports:
+      - "8081:5432"
+    volumes:
+      - ./docker/db/scripts/1_library:/docker-entrypoint-initdb.d/
+      - postgres_master_data:/bitnami/postgresql
+
+  postgres-slave-library:
+    image: bitnami/postgresql-repmgr:latest
+#    image: postgres:14.5
+    environment:
+      POSTGRESQL_POSTGRES_PASSWORD: adminpassword
+      POSTGRESQL_USERNAME: customuser
+      POSTGRESQL_PASSWORD: custompassword
+      POSTGRESQL_DATABASE: customdatabase
+      REPMGR_PASSWORD: repmgrpassword
+      REPMGR_PRIMARY_HOST: postgres-master-library
+      REPMGR_PARTNER_NODES: postgres-master-library,postgres-slave-library
+      REPMGR_NODE_NAME: node-2
+      REPMGR_NODE_NETWORK_NAME: postgres-slave-library
+    ports:
+      - "8082:5432"
+    depends_on:
+      - postgres-master-library
+    volumes:
+      - postgres_slave_data:/bitnami/postgresql
+  
+  postgres-master-trains:
+    image: bitnami/postgresql-repmgr:latest
+    #    image: 1st:latest
+    environment:
+      POSTGRESQL_POSTGRES_PASSWORD: SPIRIDONOV_214
+      POSTGRESQL_USERNAME: SPIRIDONOV_214
+      POSTGRESQL_PASSWORD: SPIRIDONOV_214
+      POSTGRESQL_DATABASE: SPIRIDONOV_214
+      REPMGR_PASSWORD: repmgrpassword
+      REPMGR_PRIMARY_HOST: postgres-master-trains
+      REPMGR_PARTNER_NODES: postgres-master-trains,postgres-slave-trains
+      REPMGR_NODE_NAME: node-1
+      REPMGR_NODE_NETWORK_NAME: postgres-master-trains
+    ports:
+      - "8083:5432"
+    volumes:
+      - ./docker/db/scripts/1_library:/docker-entrypoint-initdb.d/
+      - postgres_master_data:/bitnami/postgresql
+
+  postgres-slave-trains:
+    image: bitnami/postgresql-repmgr:latest
+    #    image: postgres:14.5
+    environment:
+      POSTGRESQL_POSTGRES_PASSWORD: adminpassword
+      POSTGRESQL_USERNAME: customuser
+      POSTGRESQL_PASSWORD: custompassword
+      POSTGRESQL_DATABASE: customdatabase
+      REPMGR_PASSWORD: repmgrpassword
+      REPMGR_PRIMARY_HOST: postgres-master-trains
+      REPMGR_PARTNER_NODES: postgres-master-trains,postgres-slave-trains
+      REPMGR_NODE_NAME: node-2
+      REPMGR_NODE_NETWORK_NAME: postgres-slave-trains
+    ports:
+      - "8084:5432"
+    depends_on:
+      - postgres-master-trains
+    volumes:
+      - postgres_slave_data:/bitnami/postgresql
+  
+  postgres-master-medic:
+    image: bitnami/postgresql-repmgr:latest
+    #    image: 1st:latest
+    environment:
+      POSTGRESQL_POSTGRES_PASSWORD: SPIRIDONOV_214
+      POSTGRESQL_USERNAME: SPIRIDONOV_214
+      POSTGRESQL_PASSWORD: SPIRIDONOV_214
+      POSTGRESQL_DATABASE: SPIRIDONOV_214
+      REPMGR_PASSWORD: repmgrpassword
+      REPMGR_PRIMARY_HOST: postgres-master-medic
+      REPMGR_PARTNER_NODES: postgres-master-medic,postgres-slave-medic
+      REPMGR_NODE_NAME: node-1
+      REPMGR_NODE_NETWORK_NAME: postgres-master-medic
+    ports:
+      - "8085:5432"
+    volumes:
+      - ./docker/db/scripts/1_library:/docker-entrypoint-initdb.d/
+      - postgres_master_data:/bitnami/postgresql
+
+  postgres-slave-medic:
+    image: bitnami/postgresql-repmgr:latest
+    #    image: postgres:14.5
+    environment:
+      POSTGRESQL_POSTGRES_PASSWORD: adminpassword
+      POSTGRESQL_USERNAME: customuser
+      POSTGRESQL_PASSWORD: custompassword
+      POSTGRESQL_DATABASE: customdatabase
+      REPMGR_PASSWORD: repmgrpassword
+      REPMGR_PRIMARY_HOST: postgres-master-medic
+      REPMGR_PARTNER_NODES: postgres-master-medic,postgres-slave-medic
+      REPMGR_NODE_NAME: node-2
+      REPMGR_NODE_NETWORK_NAME: postgres-slave-medic
+    ports:
+      - "8086:5432"
+    depends_on:
+      - postgres-master-medic
+    volumes:
+      - postgres_slave_data:/bitnami/postgresql
+
+volumes:
+  postgres_master_data:
+    driver: local
+  postgres_slave_data:
+    driver: local
